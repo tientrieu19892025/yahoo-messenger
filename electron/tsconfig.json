@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "lib": [
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "outDir": "./build",
+    "rootDir": "./src",
+    "types": [
+      "node",
+      "electron"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "YahooClone",
+  "version": "1.0.0",
+  "description": "Yahoo Clone Desktop App",
+  "main": "build/src/index.js",
+  "author": "Nguyen Tien Trieu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CoderLuii/HolyClaude.git"
+  },
+  "scripts": {
+    "build": "npx tsc",
+    "electron:make": "npm run build && npx electron-builder build --win --x64"
+  },
+  "build": {
+    "appId": "com.yahooclone.app",
+    "productName": "Yahoo Clone",
+    "publish": null,
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "dependencies": {
+    "typescript": "^6.0.2"
+  }
+}
