@@ -3,7 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, arrayUnion } from 'firebase/firestore';
 
-// 1. Cấu hình Firebase
+// 1. Firebase Configuration
 const firebaseConfig = {
   apiKey: "xxx",
   authDomain: "xxx.firebaseapp.com",
@@ -17,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// QUAN TRỌNG: Cấu trúc đường dẫn bắt buộc để không bị lỗi Permission Denied
+// IMPORTANT: Required path structure to avoid Permission Denied errors
 const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'yahoo-clone-app';
 const getUsersRef = () => collection(db, 'artifacts', APP_ID, 'public', 'data', 'yahoo_users');
 const getMessagesRef = () => collection(db, 'artifacts', APP_ID, 'public', 'data', 'yahoo_messages');
@@ -49,7 +49,7 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState(savedSoundSetting);
   const initLoadRef = useRef(true);
 
-  // Lưu thiết lập âm thanh
+  // Save sound settings
   useEffect(() => {
     localStorage.setItem('yahoo_sound_setting', JSON.stringify(soundEnabled));
   }, [soundEnabled]);
@@ -103,7 +103,7 @@ export default function App() {
           listenerHandle = req;
         }
       }
-    } catch (e) { console.error("Lỗi đăng ký backButton:", e); }
+    } catch (e) { console.error("Error registering backButton:", e); }
 
     return () => {
       if (listenerHandle && typeof listenerHandle.remove === 'function') {
@@ -117,7 +117,7 @@ export default function App() {
 
     const unsubUsers = onSnapshot(getUsersRef(), (snap) => {
       setAllUsers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    }, (err) => console.error("Lỗi tải users:", err));
+    }, (err) => console.error("Error loading users:", err));
 
     const unsubMsgs = onSnapshot(getMessagesRef(), (snap) => {
       let msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -146,7 +146,7 @@ export default function App() {
               }
             } catch (e) { }
 
-            // Rung & Chuông nền (chỉ khi được phép)
+            // Vibration & Alert sound (only if enabled)
             if (soundEnabled && lastMsg.text === 'BUZZ!!!') {
               try { if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]); } catch (e) { }
               try {
@@ -157,7 +157,7 @@ export default function App() {
           }
         }
       }
-    }, (err) => console.error("Lỗi tải tin nhắn:", err));
+    }, (err) => console.error("Error loading messages:", err));
 
     return () => { unsubUsers(); unsubMsgs(); };
   }, [firebaseUser, myProfile, activePartner, soundEnabled]);
@@ -203,7 +203,7 @@ export default function App() {
     <div className={`h-[100dvh] w-full font-sans flex items-center justify-center relative overflow-hidden md:p-6 lg:p-12 transition-colors duration-300 ${currentScreen === 'login' || currentScreen === 'register' ? 'bg-[#771285]' : 'bg-[#681a75] md:bg-[#2e3440]'}`}>
       <style dangerouslySetInnerHTML={{
         __html: `
-        /* --- CSS LOGIN --- */
+        /* --- LOGIN CSS --- */
         .bg-login-exact { background: linear-gradient(180deg, #8a109a 0%, #771285 28%, #909090 50%, #909090 100%); }
         .bg-login-dots {
           background-image: radial-gradient(rgba(0,0,0,0.18) 30%, transparent 30%);
@@ -221,7 +221,7 @@ export default function App() {
         .ios-checkbox-pink { appearance: none; width: 20px; height: 20px; background: linear-gradient(180deg, #fff 0%, #dcdcdc 100%); border: 1px solid #888; border-radius: 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); position: relative; outline: none; cursor: pointer; }
         .ios-checkbox-pink:checked::after { content: '✔'; position: absolute; color: #d61899; font-size: 18px; font-weight: 900; top: -4px; left: 2px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); }
 
-        /* --- CSS CHAT MỚI HIỆN ĐẠI HƠN --- */
+        /* --- MODERN CHAT CSS --- */
         .bg-yahoo-header { background: linear-gradient(180deg, #8a109a 0%, #771285 50%, #681a75 100%); }
         
         .bubble-me { 
@@ -239,7 +239,7 @@ export default function App() {
           color: #1e293b; 
         }
         
-        /* Nút Buzz cổ điển chuẩn Yahoo */
+        /* Classic Yahoo Buzz Button */
         .btn-classic-buzz { background: linear-gradient(180deg, #ffeba0 0%, #ffd000 49%, #ffb300 50%, #ffc000 100%); border: 1px solid #c28500; box-shadow: inset 0px 1px 1px rgba(255,255,255,0.8), 0px 1px 2px rgba(0,0,0,0.3); border-radius: 8px; color: #993300; font-weight: 900; text-shadow: 0 1px 0 rgba(255,255,255,0.5); transition: all 0.1s; }
         .btn-classic-buzz:active:not(:disabled) { transform: scale(0.96); box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); background: #e6a200; }
         .btn-classic-buzz:disabled { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; }
@@ -254,7 +254,7 @@ export default function App() {
         }
         .animate-buzz { animation: buzz-shake-screen 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         
-        /* Chống vuốt ngược Safari iOS */
+        /* Prevent Safari back-swipe on iOS */
         .overscroll-contain { overscroll-behavior-x: contain; }
         
         ::-webkit-scrollbar { width: 6px; }
@@ -273,7 +273,7 @@ export default function App() {
           />
         ) : (
           <div className="flex-1 flex w-full h-full relative overflow-hidden">
-            {/* CỘT TRÁI: Dùng absolute cho mobile để không bị khựng khi vuốt */}
+            {/* LEFT COLUMN: Absolute for mobile to prevent swipe stutter */}
             <div className={`absolute md:relative top-0 left-0 w-full md:w-[340px] lg:w-[380px] h-full flex flex-col bg-[#f8fafc] shrink-0 md:border-r border-gray-300 transition-transform duration-300 ease-in-out z-10 ${activePartner ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}`}>
               <FriendListScreen
                 myProfile={currentUserData} allUsers={allUsers} allMessages={allMessages} lastRead={lastRead} db={db}
@@ -282,7 +282,7 @@ export default function App() {
               />
             </div>
 
-            {/* CỘT PHẢI: Khung Chat */}
+            {/* RIGHT COLUMN: Chat Framework */}
             <div className={`absolute md:relative top-0 left-0 w-full md:flex-1 h-full flex flex-col bg-[#eef1f6] overflow-hidden transition-transform duration-300 ease-in-out z-20 ${!activePartner ? 'translate-x-full md:translate-x-0' : 'translate-x-0'}`}>
               {activePartner ? (
                 <ChatScreen
@@ -378,7 +378,7 @@ function FriendListScreen({ myProfile, allUsers, allMessages, lastRead, db, onLo
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchId, setSearchId] = useState('');
 
-  // TÌM NGƯỜI LẠ (Đã từng nhắn tin nhưng không có trong danh bạ)
+  // FIND STRANGERS (Users with shared messages not in friend list)
   const myFriendsIds = myProfile?.friends || [];
   const messagedUserIds = new Set();
 
@@ -414,14 +414,14 @@ function FriendListScreen({ myProfile, allUsers, allMessages, lastRead, db, onLo
 
   const handleAddFriend = async () => {
     const friendId = searchId.trim().toLowerCase();
-    if (!friendId || friendId === myProfile.username.toLowerCase()) return alert("ID không hợp lệ!");
+    if (!friendId || friendId === myProfile.username.toLowerCase()) return alert("Invalid ID!");
     const targetUser = allUsers.find(u => u.username.toLowerCase() === friendId);
-    if (!targetUser) return alert("Không tìm thấy Yahoo ID này!");
-    if (myFriendsIds.includes(targetUser.username)) return alert("Đã là bạn bè rồi!");
+    if (!targetUser) return alert("Yahoo ID not found!");
+    if (myFriendsIds.includes(targetUser.username)) return alert("Already friends!");
 
     await updateDoc(getUserDocRef(myProfile.id), { friends: arrayUnion(targetUser.username) });
     await updateDoc(getUserDocRef(targetUser.id), { friends: arrayUnion(myProfile.username) });
-    setShowAddModal(false); setSearchId(''); alert("Đã thêm bạn thành công!");
+    setShowAddModal(false); setSearchId(''); alert("Friend added successfully!");
   };
 
   const getUnreadCount = (partner) => {
@@ -441,8 +441,8 @@ function FriendListScreen({ myProfile, allUsers, allMessages, lastRead, db, onLo
         <span className="text-white font-bold text-[17px] sm:text-[18px] drop-shadow-md tracking-wide">Contacts</span>
 
         <div className="flex items-center gap-2">
-          {/* Nút bật tắt âm thanh */}
-          <button onClick={toggleSound} className="text-white text-sm bg-white/10 hover:bg-white/20 transition-colors w-8 h-8 flex items-center justify-center rounded-full border border-white/20 backdrop-blur-sm shadow-sm" title={soundEnabled ? "Tắt âm/rung" : "Bật âm/rung"}>
+          {/* Audio toggle button */}
+          <button onClick={toggleSound} className="text-white text-sm bg-white/10 hover:bg-white/20 transition-colors w-8 h-8 flex items-center justify-center rounded-full border border-white/20 backdrop-blur-sm shadow-sm" title={soundEnabled ? "Mute sound/vibration" : "Enable sound/vibration"}>
             {soundEnabled ? '🔔' : '🔕'}
           </button>
           <button onClick={() => setShowAddModal(true)} className="text-white text-xl font-bold bg-white/10 hover:bg-white/20 transition-colors w-8 h-8 flex items-center justify-center rounded-full border border-white/20 backdrop-blur-sm shadow-sm">+</button>
@@ -481,11 +481,11 @@ function FriendListScreen({ myProfile, allUsers, allMessages, lastRead, db, onLo
                   <div className="flex justify-between items-center mb-0.5">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className={`font-bold text-[15px] truncate ${user.isGroup ? 'text-purple-700' : 'text-gray-800'}`}>{user.username}</span>
-                      {user.isStranger && <span className="bg-orange-100 text-orange-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-orange-200 shrink-0">Người lạ</span>}
+                      {user.isStranger && <span className="bg-orange-100 text-orange-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-orange-200 shrink-0">Stranger</span>}
                     </div>
                     {unread > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse ml-2">{unread}</span>}
                   </div>
-                  <span className="text-[13px] text-gray-500 truncate">{user.isGroup ? 'Phòng chat công cộng' : 'I\'m using Yahoo!'}</span>
+                  <span className="text-[13px] text-gray-500 truncate">{user.isGroup ? 'Public chat room' : 'I\'m using Yahoo!'}</span>
                 </div>
               </div>
             );
@@ -496,12 +496,12 @@ function FriendListScreen({ myProfile, allUsers, allMessages, lastRead, db, onLo
       {showAddModal && (
         <div className="absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4 sm:p-6 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-6 w-full max-w-[340px] shadow-2xl flex flex-col">
-            <h3 className="font-bold text-xl mb-2 text-purple-800 text-center">Thêm Nick Yahoo</h3>
-            <p className="text-[13px] text-gray-500 mb-5 text-center">Chỉ khi có nick nhau mới chat riêng được.</p>
-            <input type="text" value={searchId} onChange={e => setSearchId(e.target.value)} placeholder="Nhập Yahoo! ID..." className="border border-gray-300 p-3 rounded-xl mb-5 bg-gray-50 text-[15px] outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 w-full transition-all" autoFocus />
+            <h3 className="font-bold text-xl mb-2 text-purple-800 text-center">Add Yahoo ID</h3>
+            <p className="text-[13px] text-gray-500 mb-5 text-center">You can only private chat once added.</p>
+            <input type="text" value={searchId} onChange={e => setSearchId(e.target.value)} placeholder="Enter Yahoo! ID..." className="border border-gray-300 p-3 rounded-xl mb-5 bg-gray-50 text-[15px] outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 w-full transition-all" autoFocus />
             <div className="flex justify-between gap-3">
-              <button onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Hủy</button>
-              <button onClick={handleAddFriend} className="flex-1 py-2.5 font-bold text-white glossy-purple rounded-xl shadow-md">Thêm Bạn</button>
+              <button onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancel</button>
+              <button onClick={handleAddFriend} className="flex-1 py-2.5 font-bold text-white glossy-purple rounded-xl shadow-md">Add Friend</button>
             </div>
           </div>
         </div>
@@ -514,7 +514,7 @@ function FriendListScreen({ myProfile, allUsers, allMessages, lastRead, db, onLo
 function ChatScreen({ myProfile, chatPartner, allMessages, db, bgClass, onCycleBg, onBack, soundEnabled }) {
   const [inputText, setInputText] = useState('');
   const [isBuzzing, setIsBuzzing] = useState(false);
-  const [canBuzz, setCanBuzz] = useState(true); // Giới hạn buzz
+  const [canBuzz, setCanBuzz] = useState(true); // Buzz rate limit
   const messagesEndRef = useRef(null);
 
   const chatMessages = allMessages.filter(m => {
@@ -533,7 +533,7 @@ function ChatScreen({ myProfile, chatPartner, allMessages, db, bgClass, onCycleB
   const triggerBuzz = async (isSender) => {
     setIsBuzzing(true);
 
-    // Tôn trọng cài đặt âm thanh (vẫn rung hình ảnh nhưng không phát ra tiếng / rung thật)
+    // Respect sound settings (shake screen but don't play sound/physical vibration if disabled)
     if (soundEnabled) {
       try { if (navigator.vibrate) navigator.vibrate(800); } catch (e) { }
       try {
@@ -544,7 +544,7 @@ function ChatScreen({ myProfile, chatPartner, allMessages, db, bgClass, onCycleB
 
     setTimeout(() => setIsBuzzing(false), 800);
 
-    // Thời gian chờ 5s nếu bạn là người ấn BUZZ
+    // 5s Cooldown for sender
     if (isSender) {
       setCanBuzz(false);
       setTimeout(() => setCanBuzz(true), 5000);
@@ -558,7 +558,7 @@ function ChatScreen({ myProfile, chatPartner, allMessages, db, bgClass, onCycleB
     setInputText('');
   };
 
-  // Nén ảnh bằng Canvas để tránh vượt quá giới hạn 1MB của Firestore Base64
+  // Compress image using Canvas to avoid Firestore 1MB Base64 limit
   const handleSendImage = () => {
     const input = document.createElement('input');
     input.type = 'file'; input.accept = 'image/*';
@@ -576,7 +576,7 @@ function ChatScreen({ myProfile, chatPartner, allMessages, db, bgClass, onCycleB
             canvas.height = img.height * scaleSize;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            // Nén xuống JPEG 0.7
+            // Compress to JPEG 0.7
             const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
             handleSend("", dataUrl);
           };
@@ -604,11 +604,11 @@ function ChatScreen({ myProfile, chatPartner, allMessages, db, bgClass, onCycleB
         <div className="flex flex-col items-center flex-1 min-w-0 px-2">
           <span className="text-white font-bold text-[17px] drop-shadow-md truncate w-full text-center">{chatPartner.username}</span>
           <span className="text-purple-200 text-[11px] font-medium mt-0.5">
-            {chatPartner.isStranger ? "Người lạ" : "Online"}
+            {chatPartner.isStranger ? "Stranger" : "Online"}
           </span>
         </div>
 
-        <button onClick={onCycleBg} className="text-white bg-white/10 active:bg-white/20 p-2 rounded-full border border-white/20 flex items-center justify-center transition-colors backdrop-blur-sm" title="Đổi hình nền">
+        <button onClick={onCycleBg} className="text-white bg-white/10 active:bg-white/20 p-2 rounded-full border border-white/20 flex items-center justify-center transition-colors backdrop-blur-sm" title="Change Background">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
         </button>
       </div>
@@ -623,12 +623,12 @@ function ChatScreen({ myProfile, chatPartner, allMessages, db, bgClass, onCycleB
         {chatMessages.map((msg, index) => {
           const isMe = msg.sender === myProfile?.username;
 
-          // Nếu là tin nhắn BUZZ, hiển thị dạng thông báo đặc biệt ở giữa
+          // Special notification for BUZZ
           if (msg.text === 'BUZZ!!!') {
             return (
               <div key={msg.id} className="w-full flex justify-center my-2">
                 <span className="text-red-500 font-bold text-[12px] md:text-[13px] uppercase tracking-wide bg-red-50 px-3 py-1 rounded-full border border-red-200 shadow-sm">
-                  {isMe ? "Bạn đã gửi BUZZ!!!" : `${msg.sender} vừa BUZZ!!!`}
+                  {isMe ? "You sent a BUZZ!!!" : `${msg.sender} sent a BUZZ!!!`}
                 </span>
               </div>
             );
