@@ -5,12 +5,12 @@ import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, or
 
 // 1. Cấu hình Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDyC9wkxkdxA3stNv7_nQZLVhkjyyPa2zc",
-  authDomain: "clone-581d0.firebaseapp.com",
-  projectId: "clone-581d0",
-  storageBucket: "clone-581d0.firebasestorage.app",
-  messagingSenderId: "35828884471",
-  appId: "1:35828884471:web:33e119b95a086daf7304f2"
+  apiKey: "xxx",
+  authDomain: "xxx.firebaseapp.com",
+  projectId: "xxx",
+  storageBucket: "xxx.firebasestorage.app",
+  messagingSenderId: "xxx",
+  appId: "xxx"
 };
 
 const app = initializeApp(firebaseConfig);
